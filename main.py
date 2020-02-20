@@ -92,8 +92,9 @@ while days_passed < D - 1:
     else:
         books_scanned = D - 1 - library.days_sign_up
 
-    outputlines.append(first_row.format(library.id, books_scanned))
-    outputlines.append(" ".join(map(lambda b: str(b.id), books[:books_scanned])))
+    book_scanned_list = books[:books_scanned]
+    outputlines.append(first_row.format(library.id, len(book_scanned_list)))
+    outputlines.append(" ".join(map(lambda b: str(b.id), book_scanned_list)))
 
     days_passed += library.priority()
     lib_index += 1
