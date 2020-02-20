@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 
 import sys
-import networkx as nx
+from functools import cmp_to_key
 
 # Classes
 
@@ -29,6 +29,10 @@ class Library:
     def priority(self):
         addition = 1 if self.books_count % self.day_scan_max > 0 else 0
         return self.days_sign_up + (self.books_count // self.day_scan_max) + addition
+
+    def max_possible_books(self):
+        addition = 1 if self.books_count % self.day_scan_max > 0 else 0
+        return (self.books_count // self.day_scan_max + addition) * self.day_scan_max
 
 
 # Arguments
@@ -72,7 +76,41 @@ for lib_id in range(len(library_lines) // 2):
 
 # Algo
 
-libraries_prioritized = sorted(LIBRARIES, key=lambda l: l.priority())
+def compare_lib(lib1, lib2):
+    """
+    lib1 < lib2 => return -1
+    lib1 == lib2 => return 0
+    lib1 > lib2 => return 1
+    """
+    diff = abs(lib1.days_sign_up - lib2.days_sign_up)
+    lib_min = sorted([lib1, lib2], key=lambda l: l.days_sign_up)[0]
+    lib_min_first_diff_books = set(sorted(list(lib_min.books_set), key=lambda b: b.score, reverse=True)[:diff])
+    lib1_after = lib1.books_set - lib_min_first_diff_books
+    lib2_after = lib2.books_set - lib_min_first_diff_books
+    first_score = sum(map(lambda b: b.score, lib1_after))
+    second_score = sum(map(lambda b: b.score, lib2_after))
+    max_score_lib = lib1_after if first_score >= second_score else lib2_after
+    global D
+    max_score_lib_ref = lib1 if max_score_lib == lib1_after else lib2
+    first_of_max = (D - 1 - max(lib1.days_sign_up, lib2.days_sign_up)) * max_score_lib_ref.day_scan_max
+    final_set = set(sorted(list(max_score_lib_ref.books_set), key=lambda b: b.score, reverse=True)[:first_of_max])
+    min_score_lib = lib1_after if first_score < second_score else lib2_after
+    smin = sum(map(lambda b: b.score, min_score_lib - final_set))
+    final_set_score = sum(map(lambda b: b.score, final_set))
+    if final_set_score > smin:
+        if max_score_lib == lib1_after:
+            return 1
+        else:
+            return -1
+    else:
+        if min_score_lib == lib1_after:
+            return 1
+        else:
+            return -1
+
+
+libraries_prioritized = sorted(LIBRARIES, key=cmp_to_key(compare_lib), reverse=False)
+# print(libraries_prioritized)
 
 libraries_signed = []
 libraries_left = libraries_prioritized.copy()
