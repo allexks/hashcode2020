@@ -82,6 +82,7 @@ def compare_lib(lib1, lib2):
     lib1 == lib2 => return 0
     lib1 > lib2 => return 1
     """
+    return rad
     diff = abs(lib1.days_sign_up - lib2.days_sign_up)
     lib_min = sorted([lib1, lib2], key=lambda l: l.days_sign_up)[0]
     lib_min_first_diff_books = set(sorted(list(lib_min.books_set), key=lambda b: b.score, reverse=True)[:diff])
@@ -92,7 +93,7 @@ def compare_lib(lib1, lib2):
     max_score_lib = lib1_after if first_score >= second_score else lib2_after
     global D
     max_score_lib_ref = lib1 if max_score_lib == lib1_after else lib2
-    first_of_max = (D - 1 - max(lib1.days_sign_up, lib2.days_sign_up)) * max_score_lib_ref.day_scan_max
+    first_of_max = (D - max(lib1.days_sign_up, lib2.days_sign_up)) * max_score_lib_ref.day_scan_max
     final_set = set(sorted(list(max_score_lib_ref.books_set), key=lambda b: b.score, reverse=True)[:first_of_max])
     min_score_lib = lib1_after if first_score < second_score else lib2_after
     smin = sum(map(lambda b: b.score, min_score_lib - final_set))
