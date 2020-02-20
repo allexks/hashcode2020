@@ -1,7 +1,7 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3
 
 import sys
-# import dsa
+import networkx as nx
 
 # Arguments
 USAGE_HELP_MSG = """Usage:
@@ -22,7 +22,7 @@ with open(f"in/{filename}", "r") as fin:
 
 
 # Algo
-print(all_input)
+print(all_input)  # TEST
 
 
 # Output
