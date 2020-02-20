@@ -31,7 +31,6 @@ class Library:
         return self.days_sign_up + (self.books_count // self.day_scan_max) + addition
 
 
-
 # Arguments
 USAGE_HELP_MSG = """Usage:
 \t$ python3 {0} x
@@ -78,23 +77,30 @@ libraries_prioritized = sorted(LIBRARIES, key=lambda l: l.priority())
 libraries_signed = []
 libraries_left = libraries_prioritized.copy()
 
+# scanned_ids = dict([(id, False) for id in range(B)])
+
+scanned_books_set = set()
+
 outputlines = []
 days_passed = 0
 lib_index = 0
-while days_passed < D - 1:
+while days_passed < D:
     library = libraries_prioritized[lib_index]
-    books = sorted(list(library.books_set), key=lambda b: b.score, reverse=True)
-    books_scanned = len(books)
+    all_books_dict = dict([(b.id, b) for b in library.books_set])
+    books_scanned_list = sorted(list(library.books_set), key=lambda b: b.score, reverse=True)
     first_row = "{0} {1}"
 
     if (D - 1) - library.priority() - days_passed > 0:
         pass
     else:
-        books_scanned = D - 1 - library.days_sign_up
+        all_needed = set(map(lambda b: b.id, books_scanned_list)) - scanned_books_set
+        all_needed_books = list(map(lambda id: all_books_dict[id], all_needed))
+        books_scanned_list = sorted(all_needed_books, key=lambda b: b.score, reverse=True)
 
-    book_scanned_list = books[:books_scanned]
-    outputlines.append(first_row.format(library.id, len(book_scanned_list)))
-    outputlines.append(" ".join(map(lambda b: str(b.id), book_scanned_list)))
+    outputlines.append(first_row.format(library.id, len(books_scanned_list)))
+    outputlines.append(" ".join(map(lambda b: str(b.id), books_scanned_list)))
+
+    scanned_books_set = scanned_books_set | set(map(lambda b: b.id, books_scanned_list))
 
     days_passed += library.priority()
     lib_index += 1
